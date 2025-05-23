@@ -3,3 +3,9 @@ compile: build
 
 build:
 	meson setup build
+
+test: compile
+	cat hexer.cpp | build/hexer -f
+
+help: compile
+	build/hexer -h
