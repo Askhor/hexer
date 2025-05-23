@@ -1,4 +1,4 @@
-compile:
+compile: build
 	cd build && meson compile
 
 build:
