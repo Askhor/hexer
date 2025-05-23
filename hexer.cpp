@@ -119,19 +119,31 @@ char read_next_hex_digit(IO io, HexerArgs args) {
                              "even number of valid hex digits)");
 }
 
+bool try_read_next_hex_digit(IO io, std::ostream *error, HexerArgs args,
+                             char &digit) {
+    try {
+        digit = read_next_hex_digit(io, args);
+        return true;
+    } catch (std::runtime_error &e) {
+        if (error != nullptr)
+            *error << "Could not decode hex stream properly. Reason: "
+                   << e.what() << std::endl;
+        return false;
+    }
+}
+
 void hex2bin(HexerArgs args) {
     IO io = getIO(args);
 
     while (true) {
         char d1, d2;
-        try {
-            d1 = read_next_hex_digit(io, args);
-            d2 = read_next_hex_digit(io, args);
-        } catch (std::runtime_error &e) {
-            std::clog << "Could not decode hex stream properly. Reason: "
-                      << e.what() << std::endl;
+        bool success;
+        success = try_read_next_hex_digit(io, nullptr, args, d1);
+        if (!success)
             return;
-        }
+        success = try_read_next_hex_digit(io, &std::clog, args, d2);
+        if (!success)
+            return;
 
         io.out << decode_hex(d1, d2);
     }
