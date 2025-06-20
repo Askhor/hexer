@@ -110,13 +110,15 @@ char read_next_hex_digit(IO io, HexerArgs args) {
             return byte;
 
         if (args.strict && !is_whitespace(byte)) {
-            throw std::runtime_error("The character " + std::to_string(byte) +
-                                     " is not a valid hex digit");
+            throw std::runtime_error("The character " + std::string(1, byte) +
+                                     " (" + std::to_string(byte) +
+                                     ") is not a valid hex digit");
         }
     }
 
-    throw std::runtime_error("EOF before second hex digit (there has to be an "
-                             "even number of valid hex digits)");
+    throw std::runtime_error(
+        "EOF before even-numbered hex digit (there has to be an "
+        "even number of valid hex digits)");
 }
 
 bool try_read_next_hex_digit(IO io, std::ostream *error, HexerArgs args,
@@ -138,7 +140,7 @@ void hex2bin(HexerArgs args) {
     while (true) {
         char d1, d2;
         bool success;
-        success = try_read_next_hex_digit(io, nullptr, args, d1);
+        success = try_read_next_hex_digit(io, &std::clog, args, d1);
         if (!success)
             return;
         success = try_read_next_hex_digit(io, &std::clog, args, d2);
